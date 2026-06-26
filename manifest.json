@@ -1,7 +1,7 @@
 {
   "name": "비즈니스 영어 빈칸 채우기 훈련",
   "short_name": "비즈 영어",
-  "start_url": "./TalkFile_business_english_fillblank_v2.html.html",
+  "start_url": "./index.html"
   "display": "standalone",
   "background_color": "#ffffff",
   "theme_color": "#4a90e2",
