@@ -1,6 +1,6 @@
 const CACHE_NAME = 'biz-english-v2';
 const ASSETS_TO_CACHE = [
-  './TalkFile_business_english_fillblank_v2.html.html',
+  './index.html'
   './manifest.json',
   './icon.png'
 ];
