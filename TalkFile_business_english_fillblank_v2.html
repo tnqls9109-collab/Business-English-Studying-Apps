@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>비즈니스 영어 빈칸 채우기 훈련</title>
+  <!-- PWA 앱 설정을 위한 매니페스트 연결 -->
+  <link rel="manifest" href="manifest.json">
+  <!-- 깨지던 아이콘을 정상 출력하기 위한 폰트 CDN 연결 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  
+  <style>
+    /* CSS 변수 선언 (기존 코드 지원용) */
+    :root {
+      --font-sans: 'Pretendard', -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+      --radius: 8px;
+      --border: #e2e8f0;
+      --border-strong: #cbd5e1;
+      --border-accent: #3b82f6;
+      --border-success: #22c55e;
+      --border-danger: #ef4444;
+      --border-warning: #eab308;
+      --text-primary: #1e293b;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --text-accent: #3b82f6;
+      --text-success: #16a34a;
+      --text-danger: #dc2626;
+      --text-warning: #ca8a04;
+      --bg-accent: #eff6ff;
+      --bg-success: #f0fdf4;
+      --bg-danger: #fef2f2;
+      --bg-warning: #fefce8;
+      --surface-1: #f8fafc;
+      --surface-2: #ffffff;
+      --fill-accent: #3b82f6;
+      --on-accent: #ffffff;
+    }
+
+    *{box-sizing:border-box;margin:0;padding:0}
+    body { background: #f1f5f9; padding: 0 16px; }
+    
+    /* 모바일 터치 시 파란 잔상 제거 및 앱 같은 부드러운 터치감 제공 */
+    button, .tab, .blank-btn {
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .app{padding:1rem 0;font-family:var(--font-sans); max-width: 600px; margin: 0 auto;}
+    .tabs{display:flex;gap:8px;margin-bottom:1.5rem}
+    .tab{flex:1; padding:10px 16px;border-radius:var(--radius);border:0.5px solid var(--border);background:#fff;font-size:14px;color:var(--text-secondary);cursor:pointer;transition:all .15s; display:flex; align-items:center; justify-content:center; gap:6px;}
+    .tab.active{background:var(--bg-accent);border-color:var(--border-accent);color:var(--text-accent);font-weight:500}
+    .mini-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.25rem}
+    .stat{background:var(--surface-2);border-radius:var(--radius);padding:10px;text-align:center; border:0.5px solid var(--border);}
+    .stat-val{font-size:20px;font-weight:500;color:var(--text-primary)}
+    .stat-val.green{color:var(--text-success)}
+    .stat-val.red{color:var(--text-danger)}
+    .stat-val.orange{color:var(--text-warning)}
+    .stat-val.blue{color:var(--text-accent)}
+    .stat-lbl{font-size:11px;color:var(--text-muted);margin-top:2px}
+    .prog-wrap{background:var(--border);border-radius:99px;height:8px;margin-bottom:6px}
+    .prog-fill{height:8px;border-radius:99px;background:var(--fill-accent);transition:width .4s}
+    .prog-lbl{font-size:13px;color:var(--text-secondary);margin-bottom:1.25rem}
+    .mode-row, .difficulty-row{display:flex;gap:8px;align-items:center;margin-bottom:1rem; flex-wrap: wrap;}
+    .mode-lbl, .diff-lbl{font-size:13px;color:var(--text-secondary); min-width: 45px;}
+    .mode-btn, .diff-btn{font-size:12px;padding:6px 14px;border-radius:99px;border:0.5px solid var(--border);background:#fff;color:var(--text-secondary);cursor:pointer}
+    .mode-btn.active, .diff-btn.active{background:var(--fill-accent);color:var(--on-accent);border-color:var(--fill-accent)}
+    .card{background:var(--surface-2);border:0.5px solid var(--border);border-radius:12px;padding:1.5rem;margin-bottom:1rem;min-height:160px; box-shadow: 0 1px 3px rgba(0,0,0,0.05);}
+    .card.correct{border-color:var(--border-success);background:var(--bg-success)}
+    .card.wrong{border-color:var(--border-danger);background:var(--bg-danger)}
+    .num-lbl{font-size:12px;color:var(--text-muted);margin-bottom:10px}
+    .kr-text{font-size:16px;font-weight: 600; color:var(--text-primary);margin-bottom:16px;line-height:1.6}
+    .en-line{font-size:18px;font-weight:500;color:var(--text-primary);line-height:1.8;word-spacing:4px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+    .word{font-size:17px;font-weight:500;color:var(--text-primary)}
+    .blank-btn{display:inline-flex;align-items:center;justify-content:center;min-width:80px;height:34px;border-radius:var(--radius);border:2px dashed var(--border-accent);background:var(--bg-accent);color:transparent;font-size:17px;font-weight:500;cursor:pointer;padding:0 8px;transition:all .2s;position:relative}
+    .blank-btn.revealed{color:var(--text-accent);border-style:solid;cursor:default}
+    .blank-btn.correct-blank{color:var(--text-success);border-color:var(--border-success);background:var(--bg-success)}
+    .blank-btn.wrong-blank{color:var(--text-danger);border-color:var(--border-danger);background:var(--bg-danger)}
+    .blank-icon{position:absolute;font-size:13px;color:var(--text-accent)}
+    .hint-row{font-size:13px;color:var(--text-muted);margin-top:12px}
+    .btns{display:flex;gap:8px;margin-bottom:8px}
+    .btn{flex:1;padding:12px;border-radius:var(--radius);border:0.5px solid var(--border-strong);background:#fff;font-size:14px;color:var(--text-primary);cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:all .15s; font-weight: 500;}
+    .btn:active{transform:scale(.98)}
+    .btn-ok{border-color:var(--border-success);color:var(--text-success);background:var(--bg-success)}
+    .btn-bad{border-color:var(--border-danger);color:var(--text-danger);background:var(--bg-danger)}
+    .btn-bk.on{background:var(--bg-warning); border-color: var(--border-warning); color: var(--text-warning);}
+    .btn-next{border-color:var(--border-accent);color:var(--on-accent);background:var(--fill-accent)}
+    .reveal-all-btn{width:100%;padding:12px;border-radius:var(--radius);border:0.5px solid var(--border-accent);background:var(--bg-accent);color:var(--text-accent);font-size:14px;cursor:pointer;margin-bottom:8px; font-weight: 500; display:flex; align-items:center; justify-content:center; gap:6px;}
+    .review-list{display:flex;flex-direction:column;gap:8px}
+    .review-item{background:var(--surface-2);border:0.5px solid var(--border);border-radius:var(--radius);padding:12px 16px}
+    .review-item.bk{border-color:var(--border-warning)}
+    .review-kr{font-size:13px;color:var(--text-secondary);margin-bottom:4px}
+    .review-en{font-size:15px;font-weight:500;color:var(--text-primary)}
+    .tag{font-size:11px;padding:2px 8px;border-radius:99px;display:inline-block;margin-top:6px}
+    .tag-wrong{background:var(--bg-danger);color:var(--text-danger)}
+    .tag-bk{background:var(--bg-warning);color:var(--text-warning)}
+    .empty{text-align:center;padding:2.5rem 1rem;color:var(--text-muted);font-size:14px; background: #fff; border-radius: var(--radius); border: 0.5px solid var(--border);}
+    .hidden{display:none!important}
+    .after-reveal{display:none}
+    .after-reveal.show{display:flex}
+    .before-reveal{display:flex}
+    .before-reveal.hide{display:none}
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); border: 0; }
+  </style>
+</head>
+<body>
+
+<div class="app">
+<h2 class="sr-only">비즈니스 영어 빈칸 채우기 훈련 앱</h2>
+
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('quiz')"><i class="ti ti-cards" aria-hidden="true"></i> 퀴즈</button>
+  <button class="tab" onclick="switchTab('review')"><i class="ti ti-rotate-clockwise" aria-hidden="true"></i> 복습</button>
+  <button class="tab" onclick="switchTab('bookmark')"><i class="ti ti-bookmark" aria-hidden="true"></i> 북마크</button>
+</div>
+
+<div id="tab-quiz">
+  <div class="mini-stats">
+    <div class="stat"><div class="stat-val blue" id="s-done">0</div><div class="stat-lbl">진행</div></div>
+    <div class="stat"><div class="stat-val green" id="s-ok">0</div><div class="stat-lbl">맞춤</div></div>
+    <div class="stat"><div class="stat-val red" id="s-bad">0</div><div class="stat-lbl">틀림</div></div>
+    <div class="stat"><div class="stat-val orange" id="s-bk">0</div><div class="stat-lbl">북마크</div></div>
+  </div>
+  <div class="prog-wrap"><div class="prog-fill" id="prog" style="width:0%"></div></div>
+  <div class="prog-lbl" id="prog-lbl">0 / 500</div>
+
+  <div class="difficulty-row">
+    <span class="diff-lbl">난이도:</span>
+    <button class="diff-btn active" id="diff-easy" onclick="setDiff('easy')">쉬움 (1개)</button>
+    <button class="diff-btn" id="diff-mid" onclick="setDiff('mid')">보통 (2개)</button>
+    <button class="diff-btn" id="diff-hard" onclick="setDiff('hard')">어려움 (3개+)</button>
+  </div>
+
+  <div class="mode-row">
+    <span class="mode-lbl">모드:</span>
+    <button class="mode-btn active" id="mode-all" onclick="setMode('all')">전체</button>
+    <button class="mode-btn" id="mode-wrong" onclick="setMode('wrong')">틀린 것만</button>
+    <button class="mode-btn" id="mode-bk" onclick="setMode('bk')">북마크만</button>
+  </div>
+
+  <div class="card" id="main-card">
+    <div class="num-lbl" id="num-lbl"></div>
+    <div class="kr-text" id="kr-text"></div>
+    <div class="en-line" id="en-line"></div>
+    <div class="hint-row" id="hint-row"></div>
+  </div>
+
+  <div class="before-reveal" id="before-area">
+    <div style="display:flex;gap:8px;width:100%;flex-direction:column">
+      <button class="reveal-all-btn" onclick="revealAll()"><i class="ti ti-eye" aria-hidden="true"></i> 빈칸 모두 보기</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn btn-bk" id="bk-btn-pre" onclick="toggleBk()"><i class="ti ti-bookmark" aria-hidden="true"></i> 북마크</button>
+        <button class="btn btn-next" onclick="nextCard()" style="flex:2"><i class="ti ti-arrow-right" aria-hidden="true"></i> 다음</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="after-reveal" id="after-area" style="flex-direction:column;gap:8px">
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-bad" onclick="markResult(false)"><i class="ti ti-x" aria-hidden="true"></i> 틀렸어요</button>
+      <button class="btn btn-ok" onclick="markResult(true)"><i class="ti ti-check" aria-hidden="true"></i> 맞았어요</button>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-bk" id="bk-btn" onclick="toggleBk()"><i class="ti ti-bookmark" aria-hidden="true"></i> 북마크</button>
+      <button class="btn btn-next" onclick="nextCard()" style="flex:2"><i class="ti ti-arrow-right" aria-hidden="true"></i> 다음</button>
+    </div>
+  </div>
+</div>
+
+<div id="tab-review" class="hidden"><div id="review-content"></div></div>
+<div id="tab-bookmark" class="hidden"><div id="bookmark-content"></div></div>
+</div>
+
+<script>
+// RAW 데이터 (데이터 보호를 위해 상위 10개 예시 배치, 실제 운용시 원본 500개 데이터 유지 가능)
+const RAW=[[1,"당신은 영업사원입니까?","Are you a salesperson?"],[2,"당신은 명함을 갖고 있습니까?","Do you have your business card?"],[3,"당신은 이곳이 처음인가요?","Is this your first time here?"],[4,"당신의 사무실 번호는 02-538-0711입니까?","Is your office number 02-538-0711?"],[5,"회의 의제는 무엇인가요?","What is the meeting agenda?"],[6,"지금 당신의 남자 형제는 무직입니까?","Is your brother unemployed at the moment?"],[7,"바쁘신가요?","Are you busy?"],[8,"당신의 아이들은 피곤하고 졸린가요?","Are your kids tired and sleepy?"],[9,"제가 늦게 전화드려도 괜찮으신가요?","Is it OK for me to call you this late?"],[10,"지금 전화하기에 좋은 시간입니까?","Is this a good time to call?"]];
+// (※ 용량 관계상 예시 데이터만 첨부했습니다. 기존 500개 전체 배열을 이 자리에 그대로 덮어쓰시면 됩니다!)
+
+const SK='biz_fill_v1';
+let st={done:{},wrong:{},bk:{},mode:'all',diff:'easy'};
+try{const s=localStorage.getItem(SK);if(s)st=Object.assign(st,JSON.parse(s));}catch(e){}
+function save(){try{localStorage.setItem(SK,JSON.stringify(st));}catch(e){}}
+
+let deck=[],idx=0,blanks=[],revealed=false;
+
+function numBlanks(){return st.diff==='easy'?1:st.diff==='mid'?2:3;}
+
+function pickBlanks(words){
+  const n=Math.min(numBlanks(),words.length);
+  const indices=[];
+  // 조사 배제를 위해 3글자 초과 단어 필터링 알고리즘 보완
+  const pool=words.map((_,i)=>i).filter(i=>words[i].replace(/[^a-zA-Z]/g,'').length>3);
+  if(pool.length === 0) return words.map((_,i)=>i).slice(0, n);
+  pool.sort(()=>Math.random()-.5);
+  return pool.slice(0,n).sort((a,b)=>a-b);
+}
+
+function buildDeck(){
+  if(st.mode==='wrong') deck=RAW.filter(r=>st.wrong[r[0]]);
+  else if(st.mode==='bk') deck=RAW.filter(r=>st.bk[r[0]]);
+  else deck=[...RAW];
+  deck.sort(()=>Math.random()-.5);
+  idx=0;
+}
+
+function setMode(m){
+  st.mode=m;save();
+  ['all','wrong','bk'].forEach(k=>document.getElementById('mode-'+k).classList.toggle('active',k===m));
+  buildDeck();showCard();
+}
+
+function setDiff(d){
+  st.diff=d;save();
+  ['easy','mid','hard'].forEach(k=>document.getElementById('diff-'+k).classList.toggle('active',k===d));
+  showCard();
+}
+
+function showCard(){
+  if(!deck.length){
+    document.getElementById('main-card').innerHTML='<div style="color:var(--text-muted);text-align:center;padding:2rem">이 모드에 문장이 없어요</div>';
+    document.getElementById('before-area').classList.add('hide');
+    document.getElementById('after-area').classList.remove('show');
+    return;
+  }
+  const item=deck[idx%deck.length];
+  revealed=false;
+  document.getElementById('main-card').className='card';
+  document.getElementById('num-lbl').textContent='#'+item[0]+' / '+RAW.length;
+  document.getElementById('kr-text').textContent=item[1];
+  const words=item[2].split(' ');
+  blanks=pickBlanks(words);
+  renderEnLine(words,blanks,false);
+  document.getElementById('hint-row').textContent='빈칸을 탭하면 단어가 보여요';
+  document.getElementById('before-area').classList.remove('hide');
+  document.getElementById('after-area').classList.remove('show');
+  updateBkBtns();updateStats();
+}
+
+function renderEnLine(words,blankIdxs,allRevealed){
+  const el=document.getElementById('en-line');
+  el.innerHTML='';
+  words.forEach((w,i)=>{
+    if(blankIdxs.includes(i)){
+      const btn=document.createElement('button');
+      btn.className='blank-btn';
+      btn.dataset.word=w;
+      btn.dataset.revealed='false';
+      btn.innerHTML='<i class="ti ti-eye blank-icon" aria-hidden="true"></i>';
+      if(allRevealed){
+        btn.textContent=w;
+        btn.classList.add('revealed');
+      } else {
+        btn.style.minWidth=Math.max(60,w.length*11)+'px';
+        btn.addEventListener('click',function(){revealBlank(this);});
+      }
+      el.appendChild(btn);
+    } else {
+      const span=document.createElement('span');
+      span.className='word';
+      span.textContent=w;
+      el.appendChild(span);
+    }
+  });
+}
+
+function revealBlank(btn){
+  if(btn.dataset.revealed==='true') return;
+  btn.dataset.revealed='true';
+  btn.textContent=btn.dataset.word;
+  btn.classList.add('revealed');
+  checkAllRevealed();
+}
+
+function checkAllRevealed(){
+  const btns=document.querySelectorAll('.blank-btn');
+  const allDone=[...btns].every(b=>b.dataset.revealed==='true');
+  if(allDone){
+    revealed=true;
+    document.getElementById('before-area').classList.add('hide');
+    document.getElementById('after-area').classList.add('show');
+  }
+}
+
+function revealAll(){
+  revealed=true;
+  const item=deck[idx%deck.length];
+  const words=item[2].split(' ');
+  renderEnLine(words,blanks,true);
+  document.getElementById('before-area').classList.add('hide');
+  document.getElementById('after-area').classList.add('show');
+}
+
+function markResult(ok){
+  const num=deck[idx%deck.length][0];
+  st.done[num]=true;
+  if(ok){delete st.wrong[num];document.getElementById('main-card').classList.add('correct');}
+  else{st.wrong[num]=true;document.getElementById('main-card').classList.add('wrong');}
+  save();updateStats();
+  setTimeout(()=>nextCard(),700);
+}
+
+function nextCard(){idx++;if(idx>=deck.length){buildDeck();}showCard();}
+
+function toggleBk(){
+  if(!deck.length) return;
+  const num=deck[idx%deck.length][0];
+  if(st.bk[num]) delete st.bk[num]; else st.bk[num]=true;
+  save();updateBkBtns();updateStats();
+}
+
+function updateBkBtns(){
+  if(!deck.length) return;
+  const on=!!st.bk[deck[idx%deck.length][0]];
+  ['bk-btn','bk-btn-pre'].forEach(id=>{const e=document.getElementById(id);if(e)e.classList.toggle('on',on);});
+}
+
+function updateStats(){
+  document.getElementById('s-done').textContent=Object.keys(st.done).length;
+  const wrongN=Object.keys(st.wrong).length;
+  document.getElementById('s-ok').textContent=Object.keys(st.done).length-wrongN;
+  document.getElementById('s-bad').textContent=wrongN;
+  document.getElementById('s-bk').textContent=Object.keys(st.bk).length;
+  const pct=Math.round(Object.keys(st.done).length/RAW.length*100);
+  document.getElementById('prog').style.width=pct+'%';
+  document.getElementById('prog-lbl').textContent=Object.keys(st.done).length+' / '+RAW.length+' 완료 ('+pct+'%)';
+}
+
+function switchTab(t){
+  ['quiz','review','bookmark'].forEach(tab=>{
+    document.getElementById('tab-'+tab).classList.toggle('hidden',tab!==t);
+  });
+  document.querySelectorAll('.tab').forEach((el,i)=>{
+    el.classList.toggle('active',['quiz','review','bookmark'][i]===t);
+  });
+  if(t==='review') renderReview();
+  if(t==='bookmark') renderBk();
+}
+
+function renderReview(){
+  const list=RAW.filter(r=>st.wrong[r[0]]);
+  const el=document.getElementById('review-content');
+  if(!list.length){el.innerHTML='<div class="empty"><i class="ti ti-mood-happy" style="font-size:32px;display:block;margin-bottom:8px;color:var(--text-success)"></i>틀린 문장이 없어요!</div>';return;}
+  el.innerHTML='<div class="review-list">'+list.map(r=>`<div class="review-item"><div class="review-kr">${r[1]}</div><div class="review-en">${r[2]}</div><span class="tag tag-wrong">틀린 문장</span></div>`).join('')+'</div>';
+}
+
+function renderBk(){
+  const list=RAW.filter(r=>st.bk[r[0]]);
+  const el=document.getElementById('bookmark-content');
+  if(!list.length){el.innerHTML='<div class="empty"><i class="ti ti-bookmark" style="font-size:32px;display:block;margin-bottom:8px;color:var(--text-muted)"></i>북마크한 문장이 없어요.</div>';return;}
+  el.innerHTML='<div class="review-list">'+list.map(r=>`<div class="review-item bk"><div class="review-kr">${r[1]}</div><div class="review-en">${r[2]}</div><span class="tag tag-bk">북마크</span></div>`).join('')+'</div>';
+}
+
+// 서비스 워커 등록 코드 추가 (PWA 구동용)
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(reg => console.log('서비스 워커가 성공적으로 등록되었습니다.', reg))
+      .catch(err => console.log('서비스 워커 등록에 실패했습니다.', err));
+  });
+}
+
+buildDeck();showCard();
+</script>
+</body>
+</html>
